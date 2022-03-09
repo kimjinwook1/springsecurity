@@ -1,9 +1,11 @@
 package hello.springsecurity.security.config;
 
+import hello.springsecurity.security.provider.CustomAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -26,7 +28,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //		auth.inMemoryAuthentication().withUser("manager").password(password).roles("MANAGER","USER");
 //		auth.inMemoryAuthentication().withUser("admin").password(password).roles("ADMIN","MANAGER","USER");
 
-		auth.userDetailsService(userDetailsService);
+//		auth.userDetailsService(userDetailsService);
+		auth.authenticationProvider(authenticationProvider());
+	}
+
+	@Bean
+	public AuthenticationProvider authenticationProvider() {
+		return new CustomAuthenticationProvider();
 	}
 
 	@Bean
@@ -50,6 +58,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.antMatchers("/config").hasRole("ADMIN")
 			.anyRequest().authenticated()
 			.and()
-			.formLogin();
+			.formLogin()
+			.loginPage("/login")
+			.loginProcessingUrl("login_proc")
+			.defaultSuccessUrl("/")
+			.permitAll();
 	}
 }
