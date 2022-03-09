@@ -1,11 +1,12 @@
 package hello.springsecurity.security.config;
 
+import hello.springsecurity.security.common.FormAuthenticationDetailsSource;
+import hello.springsecurity.security.handler.CustomAccessDeniedHandler;
 import hello.springsecurity.security.provider.CustomAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,6 +16,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
@@ -23,7 +25,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-	private final AuthenticationDetailsSource authenticationDetailsSource;
+	private final FormAuthenticationDetailsSource authenticationDetailsSource;
 	private final UserDetailsService userDetailsService;
 	private final AuthenticationSuccessHandler customAuthenticationSuccessHandler;
 	private final AuthenticationFailureHandler customAuthenticationFailureHandler;
@@ -72,6 +74,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.defaultSuccessUrl("/")
 			.successHandler(customAuthenticationSuccessHandler)
 			.failureHandler(customAuthenticationFailureHandler)
-			.permitAll();
+			.permitAll()
+			.and()
+			.exceptionHandling()
+			.accessDeniedHandler(accessDeniedHandler());
+	}
+
+	@Bean
+	public AccessDeniedHandler accessDeniedHandler() {
+		CustomAccessDeniedHandler accessDeniedHandler = new CustomAccessDeniedHandler();
+		accessDeniedHandler.setErrorPage("/denied");
+		return accessDeniedHandler;
 	}
 }
