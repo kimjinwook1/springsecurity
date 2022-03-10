@@ -1,6 +1,8 @@
 package hello.springsecurity.security.config;
 
 import hello.springsecurity.security.filter.AjaxLoginProcessingFilter;
+import hello.springsecurity.security.handler.AjaxAuthenticationFailureHandler;
+import hello.springsecurity.security.handler.AjaxAuthenticationSuccessHandler;
 import hello.springsecurity.security.provider.AjaxAuthenticationProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,6 +11,8 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
@@ -18,6 +22,15 @@ public class AjaxSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.authenticationProvider(ajaxAuthenticationProvider());
+	}
+
+	@Bean
+	public AuthenticationSuccessHandler ajaxAuthenticationSuccessHandler() {
+		return new AjaxAuthenticationSuccessHandler();
+	}
+	@Bean
+	public AuthenticationFailureHandler ajaxAuthenticationFailureHandler() {
+		return new AjaxAuthenticationFailureHandler();
 	}
 
 	@Bean
@@ -41,6 +54,8 @@ public class AjaxSecurityConfig extends WebSecurityConfigurerAdapter {
 	public AjaxLoginProcessingFilter ajaxLoginProcessingFilter() throws Exception {
 		AjaxLoginProcessingFilter ajaxLoginProcessingFilter = new AjaxLoginProcessingFilter();
 		ajaxLoginProcessingFilter.setAuthenticationManager(authenticationManagerBean());
+		ajaxLoginProcessingFilter.setAuthenticationSuccessHandler(ajaxAuthenticationSuccessHandler());
+		ajaxLoginProcessingFilter.setAuthenticationFailureHandler(ajaxAuthenticationFailureHandler());
 		return ajaxLoginProcessingFilter;
 	}
 
