@@ -1,12 +1,14 @@
 package hello.springsecurity.security.config;
 
 import hello.springsecurity.security.common.FormAuthenticationDetailsSource;
+import hello.springsecurity.security.filter.AjaxLoginProcessingFilter;
 import hello.springsecurity.security.handler.CustomAccessDeniedHandler;
 import hello.springsecurity.security.provider.CustomAuthenticationProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -41,20 +44,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		auth.authenticationProvider(authenticationProvider());
 	}
 
-	@Bean
-	public AuthenticationProvider authenticationProvider() {
-		return new CustomAuthenticationProvider();
-	}
-
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-	}
-
 	@Override
 	public void configure(WebSecurity web) throws Exception {
 		web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations());
 		//정적 파일들이 보안필터를 거치지 않고 통과처리
+	}
+
+	@Override
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		return super.authenticationManagerBean();
 	}
 
 	@Override
@@ -77,7 +75,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.permitAll()
 			.and()
 			.exceptionHandling()
-			.accessDeniedHandler(accessDeniedHandler());
+			.accessDeniedHandler(accessDeniedHandler())
+			.and()
+			.addFilterBefore(ajaxLoginProcessingFilter(), UsernamePasswordAuthenticationFilter.class);
+		http.csrf().disable();
+	}
+
+	@Bean
+	public AuthenticationProvider authenticationProvider() {
+		return new CustomAuthenticationProvider();
+	}
+
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
 	}
 
 	@Bean
@@ -85,5 +96,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		CustomAccessDeniedHandler accessDeniedHandler = new CustomAccessDeniedHandler();
 		accessDeniedHandler.setErrorPage("/denied");
 		return accessDeniedHandler;
+	}
+
+	@Bean
+	public AjaxLoginProcessingFilter ajaxLoginProcessingFilter() throws Exception {
+		AjaxLoginProcessingFilter ajaxLoginProcessingFilter = new AjaxLoginProcessingFilter();
+		ajaxLoginProcessingFilter.setAuthenticationManager(authenticationManagerBean());
+		return ajaxLoginProcessingFilter;
 	}
 }
