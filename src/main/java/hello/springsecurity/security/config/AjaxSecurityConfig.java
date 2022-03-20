@@ -29,6 +29,7 @@ public class AjaxSecurityConfig extends WebSecurityConfigurerAdapter {
 	public AuthenticationSuccessHandler ajaxAuthenticationSuccessHandler() {
 		return new AjaxAuthenticationSuccessHandler();
 	}
+
 	@Bean
 	public AuthenticationFailureHandler ajaxAuthenticationFailureHandler() {
 		return new AjaxAuthenticationFailureHandler();
@@ -52,6 +53,7 @@ public class AjaxSecurityConfig extends WebSecurityConfigurerAdapter {
 			.exceptionHandling()
 			.authenticationEntryPoint(new AjaxLoginAuthenticationEntryPoint())
 			.accessDeniedHandler(ajaxAccessDeniedHandler());
+
 		http.csrf().disable();
 
 		customConfigurerAjax(http);

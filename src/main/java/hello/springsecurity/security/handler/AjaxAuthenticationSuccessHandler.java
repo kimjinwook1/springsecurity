@@ -2,6 +2,7 @@ package hello.springsecurity.security.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import hello.springsecurity.domain.Account;
+import hello.springsecurity.domain.AccountDto;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -18,10 +19,10 @@ public class AjaxAuthenticationSuccessHandler implements AuthenticationSuccessHa
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
 		Account account = (Account) authentication.getPrincipal();
-
+		AccountDto accountDto = new AccountDto(account);
 		response.setStatus(HttpStatus.OK.value());
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 
-		objectMapper.writeValue(response.getWriter(), account);
+		objectMapper.writeValue(response.getWriter(), accountDto);
 	}
 }
