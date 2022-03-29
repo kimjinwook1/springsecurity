@@ -19,4 +19,8 @@ public class Account {
 	private String email;
 	private String age;
 	private String role;
+
+	public String getRoleKey() {
+		return role;
+	}
 }

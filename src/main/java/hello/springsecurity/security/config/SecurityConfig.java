@@ -1,5 +1,6 @@
 package hello.springsecurity.security.config;
 
+import hello.springsecurity.oauth.CustomOAuth2UserService;
 import hello.springsecurity.security.common.FormAuthenticationDetailsSource;
 import hello.springsecurity.security.handler.CustomAccessDeniedHandler;
 import hello.springsecurity.security.provider.CustomAuthenticationProvider;
@@ -28,10 +29,12 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 @Order(1)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-	private final FormAuthenticationDetailsSource authenticationDetailsSource;
 	private final UserDetailsService userDetailsService;
+	private final FormAuthenticationDetailsSource authenticationDetailsSource;
 	private final AuthenticationSuccessHandler customAuthenticationSuccessHandler;
 	private final AuthenticationFailureHandler customAuthenticationFailureHandler;
+	private final CustomOAuth2UserService customOAuth2UserService;
+
 
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -58,6 +61,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http
+
 			.authorizeRequests()
 			.antMatchers("/", "/users", "user/login/**", "/login*").permitAll()
 			.antMatchers("/mypage").hasRole("USER")
@@ -75,7 +79,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 			.permitAll()
 			.and()
 			.exceptionHandling()
-			.accessDeniedHandler(accessDeniedHandler());
+			.accessDeniedHandler(accessDeniedHandler())
+			.and()
+			.oauth2Login()
+			.loginPage("/login")
+			.defaultSuccessUrl("/")
+			.failureUrl("/login")
+			.userInfoEndpoint()
+			.userService(customOAuth2UserService);
+
+
+
+		//	.and()
+		//			.oauth2Login()
+		//			.userInfoEndpoint()
+		//			.userService(customOAuth2UserService);
 	}
 
 	@Bean
