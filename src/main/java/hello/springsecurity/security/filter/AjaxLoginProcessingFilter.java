@@ -33,9 +33,10 @@ public class AjaxLoginProcessingFilter extends AbstractAuthenticationProcessingF
 			throw new IllegalArgumentException("Username or Password is empty");
 		}
 
+		//로그인 입력한 정보를 AuthenticationManager에 전달하기위해 토큰을 생성
 		AjaxAuthenticationToken ajaxAuthenticationToken = new AjaxAuthenticationToken(accountDto.getUsername(), accountDto.getPassword());
 
-		return getAuthenticationManager().authenticate(ajaxAuthenticationToken);
+		return getAuthenticationManager().authenticate(ajaxAuthenticationToken); //위에서 만든 토큰을 AuthenticationManager에 전달
 	}
 
 	private boolean isAjax(HttpServletRequest request) {

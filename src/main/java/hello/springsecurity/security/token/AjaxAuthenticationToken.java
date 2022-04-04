@@ -13,18 +13,19 @@ public class AjaxAuthenticationToken extends AbstractAuthenticationToken{
 	private Object credentials;
 
 	public AjaxAuthenticationToken(Object principal, Object credentials) {
+		//인증을 받기 전 사용자가 입력한 로그인 아이디, 패스워드를 담는 생성자
 		super(null);
 		this.principal = principal;
 		this.credentials = credentials;
 		setAuthenticated(false);
 	}
 
-	public AjaxAuthenticationToken(Object principal, Object credentials,
-		Collection<? extends GrantedAuthority> authorities) {
+	public AjaxAuthenticationToken(Object principal, Object credentials, Collection<? extends GrantedAuthority> authorities) {
+		//인증 이후 인증 성공한 결과를 담는 생성자
 		super(authorities);
 		this.principal = principal;
 		this.credentials = credentials;
-		super.setAuthenticated(true); // must use super, as we override
+		super.setAuthenticated(true); // 권한정보
 	}
 
 	@Override

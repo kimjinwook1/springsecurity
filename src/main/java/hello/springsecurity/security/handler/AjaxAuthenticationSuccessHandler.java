@@ -11,7 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
 
+@Component
 public class AjaxAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
 	private ObjectMapper objectMapper = new ObjectMapper();
